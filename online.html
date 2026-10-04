@@ -196,7 +196,7 @@ tr.out td{opacity:.5}
 </head>
 <body>
 <!--navbar-->
-<div id="navbar" style="position:relative;z-index:9999;display:flex;gap:8px;align-items:center;padding:7px 10px;background:#0a1120;border-bottom:1px solid #2c3f5e;font-family:inherit"><a href="https://ryo5exeg-wq.github.io/ponzi/" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:#182640;border:1px solid #2c3f5e;color:#e8edf5;border-radius:99px;padding:7px 14px;font-size:14px;font-weight:600;min-height:38px;box-sizing:border-box">🏠 <span>ゲーム一覧</span></a><span id="navSlot"></span></div>
+<div id="navbar" style="position:relative;z-index:9999;display:flex;gap:8px;align-items:center;padding:7px 10px;background:#0a1120;border-bottom:1px solid #2c3f5e;font-family:inherit"><a href="https://yui-games.github.io/ponzi/" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:#182640;border:1px solid #2c3f5e;color:#e8edf5;border-radius:99px;padding:7px 14px;font-size:14px;font-weight:600;min-height:38px;box-sizing:border-box">🏠 <span>ゲーム一覧</span></a><span id="navSlot"></span></div>
 
 <!-- ============ ロビー ============ -->
 <div id="lobby">
@@ -212,7 +212,7 @@ tr.out td{opacity:.5}
     <details>
       <summary class="sub" style="cursor:pointer;padding:4px 0">サーバーの設定（ふだんは触らなくてOK）</summary>
       <div class="fld" style="margin-top:8px">
-        <input id="srv" placeholder="https://ponzi-server.ryo5exeg.workers.dev">
+        <input id="srv" placeholder="https://ponzi-server.yui-games.workers.dev">
         <div class="sub" style="margin-top:5px">つながらない時だけ、ここを確認してください。</div>
       </div>
     </details>
@@ -249,7 +249,7 @@ tr.out td{opacity:.5}
   <div class="qrbox" id="wQrBox">
     <div id="wQr"></div>
     <div class="qs">📷 スマホのカメラで読み取ると、この部屋に入れます</div>
-    <div class="qs2">💻 PCの人は ryo5exeg-wq.github.io/ponzi/ を開いて、上の部屋コードを入力</div>
+    <div class="qs2">💻 PCの人は yui-games.github.io/ponzi/ を開いて、上の部屋コードを入力</div>
   </div>
   <div class="rowb" style="margin-bottom:12px">
     <button id="btnLink">参加リンクをコピー</button>
@@ -683,7 +683,7 @@ function showOver(V){
 }
 
 /* ---------- 起動 ---------- */
-const DEFAULT_SRV='https://ponzi-server.ryo5exeg.workers.dev';
+const DEFAULT_SRV='https://ponzi-server.yui-games.workers.dev';
 (function init(){
   const saved=loadST(), q=new URLSearchParams(location.search);
   const joinCode=(q.get('r')||'').toUpperCase();
