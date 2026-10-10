@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>お題ルーレット（1〜100で伝えるゲーム用）</title>
+<style>
+:root{--bg:#1b1140;--bg2:#2a1a5e;--card:#fffaf0;--ink:#2a2140;--sub:#7a6f95;--main:#ff7a3d;--main2:#ffb347;--line:#e6dcc8;--low:#3d8bff;--high:#ff4d6d}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"Hiragino Maru Gothic ProN","BIZ UDPGothic","Yu Gothic UI","Meiryo",sans-serif;color:var(--ink);
+  background:radial-gradient(1200px 700px at 50% -10%,#4a2f9a 0%,var(--bg2) 45%,var(--bg) 100%) fixed;min-height:100vh;
+  padding:16px 16px calc(28px + env(safe-area-inset-bottom));-webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto}
+h1{color:#fff;font-size:26px;text-align:center;margin:6px 0 2px;letter-spacing:.04em;text-shadow:0 3px 0 rgba(0,0,0,.25)}
+h1 small{display:block;font-size:13px;font-weight:normal;color:#cfc4f5;margin-top:4px;letter-spacing:0}
+.card{background:var(--card);border-radius:18px;padding:16px;margin-top:14px;box-shadow:0 8px 0 rgba(0,0,0,.22)}
+
+/* リール */
+.reelBox{position:relative;height:252px;overflow:hidden;border-radius:14px;background:#241750;border:3px solid #3b2a7c}
+.reel{position:absolute;left:0;right:0;top:0;will-change:transform}
+.reel .it{height:84px;display:flex;align-items:center;justify-content:center;padding:0 14px;color:#fff;font-weight:bold;
+  font-size:clamp(17px,4.6vw,24px);text-align:center;line-height:1.25}
+.reelBox:before,.reelBox:after{content:"";position:absolute;left:0;right:0;height:84px;z-index:2;pointer-events:none}
+.reelBox:before{top:0;background:linear-gradient(#241750,rgba(36,23,80,.35))}
+.reelBox:after{bottom:0;background:linear-gradient(rgba(36,23,80,.35),#241750)}
+.reelMark{position:absolute;left:6px;right:6px;top:84px;height:84px;border:3px solid var(--main2);border-radius:12px;z-index:3;pointer-events:none;
+  box-shadow:0 0 18px rgba(255,179,71,.55)}
+.reelBox.hit .reelMark{animation:flash .5s 3}
+@keyframes flash{50%{border-color:#fff;box-shadow:0 0 30px #fff}}
+
+.spin{display:block;width:100%;margin-top:14px;padding:18px 10px;font:inherit;font-size:24px;font-weight:bold;color:#fff;cursor:pointer;
+  border:none;border-radius:16px;background:linear-gradient(180deg,var(--main2),var(--main));box-shadow:0 6px 0 #c2501c;letter-spacing:.08em}
+.spin:active{transform:translateY(4px);box-shadow:0 2px 0 #c2501c}
+.spin:disabled{filter:grayscale(.6);opacity:.7;cursor:default}
+
+/* 結果 */
+.res{text-align:center;min-height:150px;display:flex;flex-direction:column;justify-content:center}
+.res .g{display:inline-block;align-self:center;font-size:13px;color:#fff;background:#6c55c9;border-radius:99px;padding:3px 12px}
+.res .t{font-size:clamp(24px,7vw,36px);font-weight:bold;margin:10px 0 12px;line-height:1.3}
+.res .hint{color:var(--sub);font-size:15px}
+.scale{display:flex;align-items:stretch;gap:8px}
+.scale div{flex:1;border-radius:12px;padding:8px 6px;color:#fff;font-weight:bold;font-size:clamp(14px,3.8vw,17px);line-height:1.3}
+.scale .lo{background:var(--low)} .scale .hi{background:var(--high)}
+.scale b{display:block;font-size:22px}
+.scale .ar{flex:0 0 auto;background:none;color:var(--sub);align-self:center;font-size:22px;padding:0}
+
+/* 設定 */
+.lab{font-size:14px;font-weight:bold;color:var(--sub);margin:0 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:15px;padding:8px 13px;border-radius:99px;border:2px solid var(--line);background:#fff;color:#a79fb8;cursor:pointer}
+.chip.on{background:#6c55c9;border-color:#6c55c9;color:#fff;font-weight:bold}
+.row{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:14px;font-size:15px}
+.row label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.row input[type=checkbox]{width:20px;height:20px}
+.mini{font:inherit;font-size:14px;padding:7px 12px;border-radius:10px;border:2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+.cnt{color:var(--sub);font-size:14px;margin-left:auto}
+details summary{cursor:pointer;font-weight:bold;color:var(--sub);font-size:15px}
+.add{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.add input{font:inherit;font-size:16px;padding:10px;border:2px solid var(--line);border-radius:10px;min-width:0;background:#fff}
+.add input.full,.add button{grid-column:1/-1}
+.add button{font:inherit;font-size:16px;font-weight:bold;padding:11px;border:none;border-radius:10px;background:#6c55c9;color:#fff;cursor:pointer}
+.mine{list-style:none;padding:0;margin:12px 0 0}
+.mine li{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px dashed var(--line);font-size:15px}
+.mine li span{flex:1;min-width:0;word-break:break-all}
+.mine li small{display:block;color:var(--sub)}
+.foot{color:#b9aee6;font-size:12px;text-align:center;margin-top:18px;line-height:1.7}
+.foot a{display:inline-block;color:#fff;font-size:15px;font-weight:bold;text-decoration:none;border:2px solid #6c55c9;border-radius:99px;padding:8px 18px;margin-bottom:12px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mode{font:inherit;font-size:16px;font-weight:bold;padding:11px 6px;border-radius:12px;border:2px solid var(--line);background:#fff;color:#a79fb8;cursor:pointer;line-height:1.3}
+.mode small{display:block;font-size:12px;font-weight:normal}
+.mode.on{background:#6c55c9;border-color:#6c55c9;color:#fff}
+.tip{font-size:14px;color:var(--sub);margin:10px 0 0;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎯 お題ルーレット<small>1〜100の数字を「たとえ」で伝えるゲーム用</small></h1>
+
+  <div class="card">
+    <div class="reelBox" id="reelBox"><div class="reel" id="reel"></div><div class="reelMark"></div></div>
+    <button class="spin" id="spin">ルーレットを回す</button>
+  </div>
+
+  <div class="card res" id="res"><div class="hint">ボタンを押すと、お題が決まります</div></div>
+
+  <div class="card">
+    <p class="lab">どのお題であそぶ？</p>
+    <div class="modes">
+      <button class="mode" id="mBuilt">用意されたお題<small>ジャンルからえらぶ</small></button>
+      <button class="mode" id="mOnly">みんなで集めたお題だけ<small>その場で出し合う</small></button>
+    </div>
+    <div id="genreBox">
+      <p class="lab" style="margin-top:14px">出すジャンル（タップで入/切）</p>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="row">
+      <label><input type="checkbox" id="noRep">一度出たお題は出さない</label>
+      <label><input type="checkbox" id="snd">音を出す</label>
+      <button class="mini" id="resetUsed">出たお題をリセット</button>
+      <span class="cnt" id="cnt"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <details id="colBox">
+      <summary>✏️ みんなのお題を集める（<span id="colN">0</span>問）</summary>
+      <p class="tip">この端末を回して、1人ずつお題を入れてください。数字で比べられないもの、人によって感じ方がちがうものがおすすめ。</p>
+      <div class="add">
+        <input class="full" id="aT" maxlength="30" placeholder="お題（例：理想の休日のすごし方）">
+        <input id="aL" maxlength="14" placeholder="1のとき（例：イマイチ）">
+        <input id="aH" maxlength="14" placeholder="100のとき（例：最高）">
+        <button id="aAdd">このお題を入れる</button>
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="hide">入れたお題をかくす（出るまでのお楽しみ）</label>
+        <button class="mini" id="colClear">集めたお題を全部消す</button>
+      </div>
+      <ul class="mine" id="mine"></ul>
+    </details>
+  </div>
+
+  <p class="foot"><a href="../">🎲 ゲーム一覧へ</a><br>お題はこのツール用に作ったオリジナルです。<br>集めたお題と設定は、この端末のブラウザだけに保存されます。</p>
+</div>
+
+<script>
+/* [ジャンル, お題, 1のとき, 100のとき] */
+var ODAI=[
+['たべもの','食べ物の人気','人気がない','人気がある'],
+['たべもの','コンビニで買うものの人気','買わない','よく買う'],
+['たべもの','おにぎりの具の人気','人気がない','人気がある'],
+['たべもの','給食のメニューの人気','がっかり','大当たり'],
+['たべもの','お弁当に入っているとうれしいもの','うれしくない','うれしい'],
+['たべもの','夜中に食べたくなるもの','食べたくない','食べたい'],
+['たべもの','飲み物の人気','人気がない','人気がある'],
+['たべもの','おやつ・お菓子の人気','人気がない','人気がある'],
+['たべもの','人生最後の日に食べたいもの','食べたくない','食べたい'],
+['たべもの','白いごはんに合うおかず','合わない','最高に合う'],
+['たべもの','高級そうに聞こえる食べ物','庶民的','高級そう'],
+['たべもの','誕生日に出てきたらうれしい料理','うれしくない','うれしい'],
+['たべもの','「おふくろの味」っぽい料理','っぽくない','まさにそれ'],
+['たべもの','ラーメンにのせたいもの','のせたくない','のせたい'],
+['たべもの','お祭りの屋台の人気','人気がない','人気がある'],
+['たべもの','朝ごはんに出てきたらうれしいもの','うれしくない','うれしい'],
+['たべもの','なべ料理に入れたいもの','入れたくない','入れたい'],
+
+['いきもの','生き物の人気','人気がない','人気がある'],
+['いきもの','生き物の強さ','弱い','強い'],
+['いきもの','友だちになれそうな生き物','なれなさそう','なれそう'],
+['いきもの','上司にしたい生き物','イヤだ','ついていきたい'],
+['いきもの','かっこいい生き物','かっこよくない','かっこいい'],
+['いきもの','ペットにしたい生き物','飼いたくない','飼いたい'],
+['いきもの','動物園・水族館の人気者','人気がない','人気がある'],
+['いきもの','生き物のかわいさ','かわいくない','かわいい'],
+['いきもの','出会ったらこわい生き物','こわくない','こわい'],
+['いきもの','生き物のかしこさ','そうでもない','かしこい'],
+['いきもの','虫の人気','人気がない','人気がある'],
+['いきもの','生まれ変わりたい生き物','なりたくない','なりたい'],
+['いきもの','背中に乗ってみたい生き物','乗りたくない','乗りたい'],
+
+['くらし','もらってうれしいプレゼント','うれしくない','うれしい'],
+['くらし','「大人だなあ」と感じるもの','子どもっぽい','大人っぽい'],
+['くらし','ぜいたくだと感じること','ふつう','ぜいたく'],
+['くらし','なかなか捨てられないもの','すぐ捨てる','捨てられない'],
+['くらし','なくなると困るもの','困らない','とても困る'],
+['くらし','カバンに入っているもの','入っていない','必ず入っている'],
+['くらし','旅行に持っていきたいもの','いらない','絶対いる'],
+['くらし','家事のめんどくささ','らく','めんどう'],
+['くらし','センスがいいと思われる持ち物','ふつう','センスがいい'],
+['くらし','乗り物の人気','人気がない','人気がある'],
+['くらし','住んでみたい場所','住みたくない','住みたい'],
+['くらし','旅行で行きたい場所','行きたくない','行きたい'],
+['くらし','休みの日の過ごし方の人気','人気がない','人気がある'],
+['くらし','なつかしいと感じるもの','なつかしくない','とてもなつかしい'],
+['くらし','一人暮らしで最初にそろえたいもの','あとでいい','まっさきに'],
+['くらし','いやされる音','いやされない','いやされる'],
+['くらし','朝起きてすぐやること','やらない','必ずやる'],
+['くらし','100円ショップで買うもの','買わない','よく買う'],
+['くらし','無人島に持っていきたいもの','いらない','絶対いる'],
+
+['がっこう・しごと','学校の教科の人気','人気がない','人気がある'],
+['がっこう・しごと','学校の行事の人気','人気がない','人気がある'],
+['がっこう・しごと','なりたい職業','なりたくない','なりたい'],
+['がっこう・しごと','たいへんそうな仕事','らくそう','たいへんそう'],
+['がっこう・しごと','部活・習い事の人気','人気がない','人気がある'],
+['がっこう・しごと','文房具の人気','人気がない','人気がある'],
+['がっこう・しごと','学校にあったらテンションが上がるもの','上がらない','上がる'],
+['がっこう・しごと','理想の先生・上司の特徴','イヤだ','理想的'],
+['がっこう・しごと','休み時間の過ごし方の人気','人気がない','人気がある'],
+['がっこう・しごと','先生に言われてうれしい一言','うれしくない','うれしい'],
+['がっこう・しごと','職場で言われてうれしい一言','うれしくない','うれしい'],
+['がっこう・しごと','遅刻の言いわけの通りやすさ','通らない','通る'],
+['がっこう・しごと','かっこいい資格・特技','ふつう','かっこいい'],
+
+['あそび・エンタメ','スポーツの人気','人気がない','人気がある'],
+['あそび・エンタメ','ゲームのジャンルの人気','人気がない','人気がある'],
+['あそび・エンタメ','アニメ・マンガのキャラの強さ','弱い','強い'],
+['あそび・エンタメ','アニメ・マンガのキャラの人気','人気がない','人気がある'],
+['あそび・エンタメ','有名人の知名度','知られていない','だれでも知っている'],
+['あそび・エンタメ','遊園地の乗り物の人気','人気がない','人気がある'],
+['あそび・エンタメ','遊園地の乗り物のこわさ','こわくない','こわい'],
+['あそび・エンタメ','カラオケで盛り上がる曲','盛り上がらない','盛り上がる'],
+['あそび・エンタメ','楽器の人気','人気がない','人気がある'],
+['あそび・エンタメ','おもちゃの人気','人気がない','人気がある'],
+['あそび・エンタメ','公園の遊具の人気','人気がない','人気がある'],
+['あそび・エンタメ','映画・ドラマのジャンルの人気','人気がない','人気がある'],
+['あそび・エンタメ','ゲームのボスっぽい名前','弱そう','強そう'],
+['あそび・エンタメ','必殺技っぽい名前の強さ','弱そう','強そう'],
+['あそび・エンタメ','趣味にしたらモテそうなもの','モテなさそう','モテそう'],
+['あそび・エンタメ','雨の日の遊びの人気','人気がない','人気がある'],
+
+['もしも','ゾンビの世界で持っていたい武器','役に立たない','役に立つ'],
+['もしも','魔法が1つ使えるなら','いらない','ほしい'],
+['もしも','もらえたらうれしい超能力','うれしくない','うれしい'],
+['もしも','宝くじが当たったら買うもの','買わない','絶対買う'],
+['もしも','タイムマシンで行きたい時代','行きたくない','行きたい'],
+['もしも','無人島にいっしょに行きたい人・キャラ','行きたくない','行きたい'],
+['もしも','勇者の仲間にしたい職業','いらない','ほしい'],
+['もしも','敵にまわしたくないもの','平気','絶対イヤ'],
+['もしも','自分の家にほしい設備','いらない','ほしい'],
+['もしも','一日だけなってみたいもの','なりたくない','なりたい'],
+['もしも','ロボットに付けたい機能','いらない','ほしい'],
+['もしも','宇宙に持っていきたいもの','いらない','絶対いる'],
+['もしも','学校・会社に新しく作りたいルール','いらない','ほしい'],
+['もしも','オバケ屋敷に出てきたらこわいもの','こわくない','こわい'],
+
+['きもち','言われてうれしい言葉','うれしくない','うれしい'],
+['きもち','テンションが上がる瞬間','上がらない','最高に上がる'],
+['きもち','はずかしい失敗','はずかしくない','とてもはずかしい'],
+['きもち','ちょっとイラッとすること','気にならない','イラッとする'],
+['きもち','小さなしあわせ','ふつう','しあわせ'],
+['きもち','こわいもの','こわくない','こわい'],
+['きもち','緊張する場面','緊張しない','とても緊張する'],
+['きもち','人にされてうれしいこと','うれしくない','うれしい'],
+['きもち','ついやってしまうクセ','やらない','よくやる'],
+['きもち','子どものころ好きだったもの','そうでもない','大好きだった'],
+['きもち','がんばった自分へのごほうび','うれしくない','うれしい'],
+['きもち','季節を感じるもの（夏らしさ）','夏らしくない','とても夏らしい'],
+['きもち','季節を感じるもの（冬らしさ）','冬らしくない','とても冬らしい'],
+['きもち','かっこいいと思うセリフ','かっこよくない','かっこいい'],
+['きもち','友だちに自慢できること','自慢にならない','自慢できる']
+];
+var MINE='みんなのお題', KEY='odai_roulette_v1', H=84;
+var $=function(id){return document.getElementById(id);};
+
+/* mode: 'built'＝用意されたお題（＋集めたお題もジャンルの1つ）／'only'＝集めたお題だけ */
+var st={custom:[],used:[],off:[],noRep:true,snd:true,mode:'built',hide:false};
+try{ var sv=JSON.parse(localStorage.getItem(KEY)||'null'); if(sv) for(var k in st) if(sv[k]!==undefined) st[k]=sv[k]; }catch(e){}
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){} }
+
+function all(){ return ODAI.concat(st.custom.map(function(c){return [MINE,c[0],c[1],c[2]];})); }
+function genres(){ var g=[]; all().forEach(function(o){ if(g.indexOf(o[0])<0) g.push(o[0]); }); return g; }
+function pool(){
+  if(st.mode==='only') return all().filter(function(o){ return o[0]===MINE; });
+  return all().filter(function(o){ return st.off.indexOf(o[0])<0; });
+}
+function fresh(){ var p=pool(); return st.noRep ? p.filter(function(o){return st.used.indexOf(o[1])<0;}) : p; }
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+
+function drawChips(){
+  var box=$('chips'); box.textContent='';
+  genres().forEach(function(g){
+    var b=document.createElement('button'); b.className='chip'+(st.off.indexOf(g)<0?' on':''); b.textContent=g;
+    b.onclick=function(){ var i=st.off.indexOf(g); if(i<0) st.off.push(g); else st.off.splice(i,1); save(); drawChips(); };
+    box.appendChild(b);
+  });
+  var p=pool().length, f=fresh().length;
+  $('cnt').textContent = st.noRep ? ('のこり '+f+' / '+p+'問') : ('全 '+p+'問');
+  $('mBuilt').className='mode'+(st.mode==='built'?' on':'');
+  $('mOnly').className='mode'+(st.mode==='only'?' on':'');
+  $('genreBox').style.display = st.mode==='only' ? 'none' : '';
+}
+function drawMine(){
+  var ul=$('mine'); ul.textContent='';
+  $('colN').textContent=st.custom.length;
+  if(st.hide){
+    if(st.custom.length){ var li0=document.createElement('li'); li0.textContent='🙈 '+st.custom.length+'問 入っています（かくし中）'; ul.appendChild(li0); }
+    return;
+  }
+  st.custom.forEach(function(c,i){
+    var li=document.createElement('li'), sp=document.createElement('span'), sm=document.createElement('small'), b=document.createElement('button');
+    sp.textContent=c[0]; sm.textContent='1：'+c[1]+'　100：'+c[2]; sp.appendChild(sm);
+    b.className='mini'; b.textContent='消す';
+    b.onclick=function(){ st.custom.splice(i,1); save(); drawMine(); drawChips(); };
+    li.appendChild(sp); li.appendChild(b); ul.appendChild(li);
+  });
+}
+function reelItem(txt){ var d=document.createElement('div'); d.className='it'; d.textContent=txt; return d; }
+function idleReel(){
+  var r=$('reel'); r.textContent=''; r.style.transform='translateY(0)';
+  ['？？？','ここにお題が出ます','？？？'].forEach(function(t){ r.appendChild(reelItem(t)); });
+}
+function showRes(o){
+  var r=$('res'); r.textContent='';
+  var g=document.createElement('div'); g.className='g'; g.textContent=o[0];
+  var t=document.createElement('div'); t.className='t'; t.textContent=o[1];
+  var s=document.createElement('div'); s.className='scale';
+  var lo=document.createElement('div'); lo.className='lo'; lo.innerHTML='<b>1</b>'; lo.appendChild(document.createTextNode(o[2]));
+  var ar=document.createElement('div'); ar.className='ar'; ar.textContent='⇔';
+  var hi=document.createElement('div'); hi.className='hi'; hi.innerHTML='<b>100</b>'; hi.appendChild(document.createTextNode(o[3]));
+  s.appendChild(lo); s.appendChild(ar); s.appendChild(hi);
+  r.appendChild(g); r.appendChild(t); r.appendChild(s);
+}
+function msg(t){ var r=$('res'); r.textContent=''; var d=document.createElement('div'); d.className='hint'; d.textContent=t; r.appendChild(d); }
+
+var ac=null;
+function beep(freq,len,vol){
+  if(!st.snd) return;
+  try{
+    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    var o=ac.createOscillator(), g=ac.createGain();
+    o.type='triangle'; o.frequency.value=freq; g.gain.value=vol||0.08;
+    g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+len);
+    o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime+len);
+  }catch(e){}
+}
+
+var busy=false;
+function spin(){
+  if(busy) return;
+  var f=fresh();
+  if(!pool().length){ msg(st.mode==='only' ? '下の「みんなのお題を集める」から、お題を入れてください' : 'ジャンルを1つ以上えらんでください'); return; }
+  if(!f.length){ msg('お題を全部出しきりました。「出たお題をリセット」を押してください'); return; }
+  busy=true; $('spin').disabled=true; $('reelBox').classList.remove('hit');
+  var win=pick(f), src=pool(), N=30, items=[];
+  for(var i=0;i<N;i++) items.push(pick(src));
+  items[N-2]=win;
+  var r=$('reel'); r.textContent='';
+  /* かくし中は、まだ出ていないお題が回転中に見えないようにする */
+  var secret=(st.mode==='only' && st.hide), dummy=['？？？','だれのお題？','どれが出る？'];
+  items.forEach(function(o,i){ r.appendChild(reelItem(secret && i!==N-2 ? dummy[i%3] : o[1])); });
+  var dist=(N-3)*H, dur=3600, t0=performance.now(), last=-1;
+  /* requestAnimationFrame は画面が裏にあると止まるので、タイマーで回す（必ず最後まで進む） */
+  (function frame(){
+    var p=Math.min(1,(performance.now()-t0)/dur), e=1-Math.pow(1-p,4), y=dist*e;
+    r.style.transform='translateY('+(-y)+'px)';
+    var idx=Math.floor(y/H+0.5);
+    if(idx!==last){ last=idx; beep(520+Math.random()*60,0.05,0.05); }
+    if(p<1){ setTimeout(frame,16); return; }
+    $('reelBox').classList.add('hit');
+    beep(784,0.18,0.1); setTimeout(function(){ beep(1047,0.35,0.1); },150);
+    if(st.used.indexOf(win[1])<0) st.used.push(win[1]);
+    save(); showRes(win); drawChips();
+    busy=false; $('spin').disabled=false; $('spin').textContent='もう一回 回す';
+  })();
+}
+
+$('spin').onclick=spin;
+$('noRep').checked=st.noRep; $('snd').checked=st.snd;
+$('noRep').onchange=function(){ st.noRep=this.checked; save(); drawChips(); };
+$('snd').onchange=function(){ st.snd=this.checked; save(); };
+$('resetUsed').onclick=function(){ st.used=[]; save(); drawChips(); msg('出たお題をリセットしました'); };
+$('aAdd').onclick=function(){
+  var t=$('aT').value.trim(), l=$('aL').value.trim()||'低い', h=$('aH').value.trim()||'高い';
+  if(!t){ $('aT').focus(); return; }
+  if(all().some(function(o){return o[1]===t;})){ alert('同じお題がもうあります'); return; }
+  st.custom.push([t,l,h]); save(); $('aT').value=$('aL').value=$('aH').value=''; drawMine(); drawChips();
+};
+function setMode(m){ st.mode=m; save(); if(m==='only') $('colBox').open=true; drawChips(); }
+$('mBuilt').onclick=function(){ setMode('built'); };
+$('mOnly').onclick=function(){ setMode('only'); };
+$('hide').checked=st.hide;
+$('hide').onchange=function(){ st.hide=this.checked; save(); drawMine(); };
+$('colClear').onclick=function(){
+  if(!st.custom.length || !confirm('集めたお題を全部消しますか？')) return;
+  st.custom=[]; save(); drawMine(); drawChips();
+};
+if(st.mode==='only') $('colBox').open=true;
+idleReel(); drawChips(); drawMine();
+</script>
+</body>
+</html>
