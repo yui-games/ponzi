@@ -23,6 +23,7 @@ body::before{content:"";position:fixed;inset:0;background:#0d1524;opacity:.5;poi
 .wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:26px 14px calc(30px + var(--safe))}
 h1{font-size:29px;text-align:center;margin:0 0 6px;letter-spacing:.04em;
   background:linear-gradient(90deg,var(--gold2),#c98b3a);-webkit-background-clip:text;background-clip:text;color:transparent}
+h1 img{display:block;margin:0 auto;width:min(100%,520px);height:auto;filter:drop-shadow(0 6px 14px rgba(0,0,0,.55))}
 .lead{text-align:center;color:var(--dim);font-size:14px;margin-bottom:26px;line-height:1.6}
 
 .game{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px;
@@ -61,7 +62,7 @@ a.btn.kids{border-color:var(--green);color:#bdf0d3}
 </head>
 <body>
 <div class="wrap">
-  <h1>🎲 ボードゲーム置き場</h1>
+  <h1><img src="https://yui-games.github.io/ponzi/assets/hub_title.png" alt="ボードゲーム置き場" width="760" height="244"></h1>
   <div class="lead">ひとりでAIと遊ぶ「ソロ」と、みんなで遊ぶ「オンライン」が選べます。<br>
     オンラインは<b>スマホでもOK</b>。その場なら部屋を作って<b>画面のQRを見せるだけ</b>です。</div>
 
@@ -170,7 +171,8 @@ a.btn.kids{border-color:var(--green);color:#bdf0d3}
     </div>
 
     <div class="game">
-      <h2><span class="em">🎯</span>お題ルーレット<span class="meta">何人でも</span> <span class="meta">ito用ツール</span></h2>
+      <div class="glogo"><img src="https://yui-games.github.io/ponzi/assets/hub_odai.png" alt="お題ルーレット" loading="lazy"></div>
+      <h2 class="hasLogo"><span class="nm">お題ルーレット</span><span class="meta">何人でも</span> <span class="meta">ito用ツール</span></h2>
       <div class="desc">
         1〜100の数字を「たとえ」で伝えるゲームの<b>お題</b>を、ルーレットで決めるツール。
         用意されたお題のほか、<b>その場のみんなで出し合ったお題だけ</b>で遊ぶこともできる。
