@@ -6,6 +6,12 @@
 <meta name="theme-color" content="#0d1524">
 <link rel="icon" href="icon-180.png">
 <link rel="apple-touch-icon" href="icon-180.png">
+<!-- ホーム画面に追加した時の設定。scope を "/" にして、yui-games.github.io の各ゲーム（ポーカーチップ等）も
+     同じアプリの中で全画面のまま開くようにする（workers.dev のゲームは別の場所なので簡易ブラウザで開く） -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ボドゲ置き場">
 <title>ボードゲーム置き場</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
