@@ -424,8 +424,10 @@ async function poll(){
   try{
     const j=await api('/api/room/'+ST.code+'/state','GET',null,'?playerId='+ST.pid);
     failCnt=0; $('conn').classList.remove('bad');
+    /* 自分が取引の金額を入力している間は、盤面が変わっていなければ描き直さない（入力が消えるのを防ぐ） */
+    const keep=ST.view&&j.rev===ST.rev&&ST.view.pending&&ST.view.pending.pi===ST.you&&ST.view.pending.kind==='insider'&&$('trP');
     ST.room=j.room; ST.you=j.you; ST.rev=j.rev;
-    if(j.started&&j.view){ST.view=j.view; toGame(); renderGame();}
+    if(j.started&&j.view){ if(!keep){ST.view=j.view; toGame(); renderGame();} }
     else{toWait(); renderWait();}
   }catch(e){
     failCnt++; if(failCnt>1)$('conn').classList.add('bad');

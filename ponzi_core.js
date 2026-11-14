@@ -565,8 +565,11 @@ function actSkip(){
 function actTrade(j,t,P){
   const pd=G.pending; if(!pd||pd.kind!=='insider')return false;
   const p=G.players[pd.pi],q=G.players[j];
-  if(P<1||P>p.cash)return false;
-  if(p.ind[t]<1||q.ind[t]<1)return false;
+  if(!q||q===p||q.out)return false;
+  if(!(P>=1&&P<=p.cash))return false;
+  if(!(p.ind[t]>=1&&q.ind[t]>=1))return false;
+  /* 相手が人なら、売る／買うは本人に選んでもらう（AIのときだけ即決） */
+  if(!q.ai){G.pending={kind:'decide',pi:q.i,from:p.i,t:t,P:P};return true;}
   const dec=targetDecide(q,p,t,P);
   applyTrade(p,q,t,P,dec);
   G.pending=null;G.cursor++;return true;
