@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<title>コード（赤/黄選択ツール）ボムバスターズ用</title>
+<style>
+:root{--bg:#0b1020;--panel:#151d36;--line:#2b3760;--txt:#e9edf7;--dim:#97a3c4;--yel:#ffc93c;--red:#ff4b5c;--blue:#4c8dff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font-family:"Yu Gothic UI","Hiragino Sans","Meiryo",system-ui,sans-serif;color:var(--txt);font-size:16px;
+  background:radial-gradient(1000px 600px at 50% -10%,#1d2a55 0%,var(--bg) 60%) fixed,var(--bg);min-height:100vh;
+  padding:14px 14px calc(28px + env(safe-area-inset-bottom));-webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto}
+.back{display:inline-block;color:var(--txt);font-size:14px;font-weight:bold;text-decoration:none;border:1px solid var(--line);
+  border-radius:99px;padding:6px 14px;background:rgba(0,0,0,.25)}
+h1{font-size:25px;text-align:center;margin:12px 0 2px;color:var(--yel);letter-spacing:.04em}
+h1 img{display:block;margin:0 auto;width:min(100%,400px);height:auto;filter:drop-shadow(0 6px 14px rgba(0,0,0,.55))}
+h1 small{display:block;font-size:13px;font-weight:normal;color:var(--dim);margin-top:4px;letter-spacing:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:14px}
+.card.red{border-left:6px solid var(--red)}
+.card.yel{border-left:6px solid var(--yel)}
+.ttl{font-size:18px;font-weight:bold;margin:0 0 10px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.ttl span{font-size:13px;font-weight:normal;color:var(--dim)}
+.red .ttl{color:#ff8a95}.yel .ttl{color:var(--yel)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:15px;padding:9px 13px;border-radius:99px;border:1px solid var(--line);background:#0b1226;color:var(--dim);cursor:pointer}
+.red .chip.on{background:var(--red);border-color:var(--red);color:#fff;font-weight:bold}
+.yel .chip.on{background:var(--yel);border-color:var(--yel);color:#2a1f00;font-weight:bold}
+.steps{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:12px;font-size:14px;color:var(--dim)}
+.step{display:flex;align-items:center;gap:6px}
+.step button{font:inherit;font-size:20px;font-weight:bold;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);
+  background:#0b1226;color:var(--txt);cursor:pointer}
+.step button:disabled{opacity:.35;cursor:default}
+.step b{display:inline-block;min-width:1.6em;text-align:center;font-size:20px;color:var(--txt)}
+.go{display:block;width:100%;margin-top:16px;padding:18px 10px;font:inherit;font-size:23px;font-weight:bold;color:#2a1f00;cursor:pointer;
+  border:none;border-radius:16px;background:linear-gradient(180deg,#ffdc74,var(--yel));box-shadow:0 6px 0 #a87f12;letter-spacing:.06em}
+.go:active{transform:translateY(4px);box-shadow:0 2px 0 #a87f12}
+.go:disabled{filter:grayscale(.7);opacity:.6;cursor:default}
+.res h2{font-size:17px;margin:0 0 4px}
+.res .red h2,.rs.red h2{color:#ff8a95}.rs.yel h2{color:var(--yel)}
+.rs{padding:12px 0}
+.rs + .rs{border-top:1px dashed var(--line)}
+.tiles{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 6px}
+.tile{width:72px;height:92px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:27px;font-weight:bold;
+  box-shadow:0 5px 0 rgba(0,0,0,.45);font-variant-numeric:tabular-nums}
+.tile.red{background:linear-gradient(180deg,#ff6e7c,#e02f43);color:#fff;border:2px solid #ffb0b8}
+.tile.yel{background:linear-gradient(180deg,#ffe08a,#f5b915);color:#2a1f00;border:2px solid #fff0c0}
+.tile.q{border-style:dashed}
+.tile.roll{animation:roll .12s linear infinite}
+@keyframes roll{50%{transform:translateY(-4px) rotate(-3deg)}}
+.note{font-size:14px;line-height:1.7;color:var(--dim)}
+.note b{color:var(--txt)}
+.how{background:#0b1226;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:14px;line-height:1.75;color:var(--dim)}
+.how b{color:var(--txt)}
+.empty{color:var(--dim);font-size:15px;text-align:center;padding:18px 0}
+details{margin-top:14px;color:var(--dim);font-size:14px;line-height:1.8}
+details summary{cursor:pointer;font-weight:bold}
+.foot{color:#6f7da3;font-size:12px;text-align:center;margin-top:18px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="https://yui-games.github.io/ponzi/">🎲 ゲーム一覧へ</a>
+  <h1><img src="../assets/hub_code.png" alt="コード（赤/黄選択ツール）" width="720" height="266"><small>ボムバスターズを実物で遊ぶとき、赤と黄色の数字を決めるツール</small></h1>
+
+  <div class="card red" id="cRed">
+    <p class="ttl">赤いコード <span>1.5 〜 11.5</span></p>
+    <div class="chips" data-c="red"></div>
+    <div class="steps" data-c="red"></div>
+  </div>
+
+  <div class="card yel" id="cYel">
+    <p class="ttl">黄色いコード <span>1.1 〜 11.1</span></p>
+    <div class="chips" data-c="yel"></div>
+    <div class="steps" data-c="yel"></div>
+  </div>
+
+  <button class="go" id="go">えらぶ</button>
+
+  <div class="card res" id="res"><div class="empty">ミッションカードに合わせて本数をえらび、<br>「えらぶ」を押してください。</div></div>
+
+  <details>
+    <summary>使い方</summary>
+    ・ミッションカードに書いてある本数を、赤と黄色それぞれでえらぶ（使わない色は「なし」）。<br>
+    ・「3本のうち2本」のような指定は、候補の3本を画面に出します。その3枚を<b>裏向きでまぜて2枚だけ</b>山に入れ、残りは見ないで箱にもどしてください（どれが入ったかは誰にも分からない）。<br>
+    ・ボードの目印は、画面に出た数字ぜんぶに置きます。<br>
+    ・カードにない組み合わせは、＋−で自由に決められます。
+  </details>
+  <div class="foot">この画面だけで動きます（通信なし）。結果はこの端末にだけ残ります。</div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var KEY='bomb_wire_v1', MAX=11;
+var COL={red:{name:'赤',dec:5},yel:{name:'黄色',dec:1}};
+// [使う本数, 候補の本数]
+var PRESET=[[0,0],[1,1],[2,2],[3,3],[4,4],[1,2],[1,3],[2,3]];
+var st={red:{use:1,draw:1},yel:{use:0,draw:0},last:null};
+try{var s=JSON.parse(localStorage.getItem(KEY)||'null');
+  if(s&&s.red&&s.yel){['red','yel'].forEach(function(c){
+    var d=Math.max(0,Math.min(MAX,s[c].draw|0)),u=Math.max(0,Math.min(d,s[c].use|0));
+    if(d>0&&u===0)u=d; st[c]={use:u,draw:d};});
+    if(s.last&&Array.isArray(s.last.red)&&Array.isArray(s.last.yel))st.last=s.last;}
+}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+function label(u,d){return d===0?'なし':(u===d?d+'本':d+'本のうち'+u+'本');}
+function rnd(n){ // 0..n-1 をかたよりなく
+  if(window.crypto&&crypto.getRandomValues){var a=new Uint32Array(1),lim=Math.floor(4294967296/n)*n;
+    do{crypto.getRandomValues(a);}while(a[0]>=lim);return a[0]%n;}
+  return Math.floor(Math.random()*n);}
+function pick(k){var a=[],i,j,t;for(i=1;i<=MAX;i++)a.push(i);
+  for(i=a.length-1;i>0;i--){j=rnd(i+1);t=a[i];a[i]=a[j];a[j]=t;}
+  return a.slice(0,k).sort(function(x,y){return x-y;});}
+function val(c,n){return n+'.'+COL[c].dec;}
+function esc(s){return String(s).replace(/[&<>"]/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});}
+
+function drawSet(c){
+  var box=document.querySelector('.chips[data-c="'+c+'"]'),sp=document.querySelector('.steps[data-c="'+c+'"]'),v=st[c],h='';
+  PRESET.forEach(function(p,i){h+='<button class="chip'+(p[0]===v.use&&p[1]===v.draw?' on':'')+'" data-i="'+i+'">'+label(p[0],p[1])+'</button>';});
+  box.innerHTML=h;
+  sp.innerHTML='<div class="step">候補 <button data-k="draw" data-d="-1"'+(v.draw<=0?' disabled':'')+'>−</button><b>'+v.draw+'</b>'
+    +'<button data-k="draw" data-d="1"'+(v.draw>=MAX?' disabled':'')+'>＋</button> 本</div>'
+    +'<div class="step">そのうち使う <button data-k="use" data-d="-1"'+(v.use<=(v.draw?1:0)?' disabled':'')+'>−</button><b>'+v.use+'</b>'
+    +'<button data-k="use" data-d="1"'+(v.use>=v.draw?' disabled':'')+'>＋</button> 本</div>';
+}
+function setVal(c,u,d){st[c]={use:u,draw:d};save();drawSet(c);}
+['red','yel'].forEach(function(c){
+  document.querySelector('.chips[data-c="'+c+'"]').addEventListener('click',function(e){
+    var b=e.target.closest('.chip');if(!b)return;var p=PRESET[+b.dataset.i];setVal(c,p[0],p[1]);});
+  document.querySelector('.steps[data-c="'+c+'"]').addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b||b.disabled)return;var v=st[c],u=v.use,d=v.draw,x=+b.dataset.d;
+    if(b.dataset.k==='draw'){var same=(u===d);d=Math.max(0,Math.min(MAX,d+x));u=same?d:Math.min(u,d);if(d>0&&u<1)u=1;}
+    else{u=Math.max(d?1:0,Math.min(d,u+x));}
+    setVal(c,u,d);});
+  drawSet(c);
+});
+
+function section(c,r,rolling){
+  if(!r.draw)return'';
+  var part=r.use<r.draw,h='<div class="rs '+c+'"><h2>'+COL[c].name+'：'+label(r.use,r.draw)+'</h2><div class="tiles">';
+  r.nums.forEach(function(n){h+='<div class="tile '+c+(part?' q':'')+(rolling?' roll':'')+'">'+esc(val(c,n))+'</div>';});
+  h+='</div>';
+  if(!rolling){
+    if(part)h+='<div class="how">① この<b>'+r.draw+'枚</b>を箱から出し、<b>裏向きでよくまぜる</b><br>② <b>'+r.use+'枚だけ</b>を青いコードの山に入れる<br>③ 残りの'+(r.draw-r.use)+'枚は<b>見ないで</b>箱にもどす<br>④ ボードの目印は<b>'+r.draw+'か所ぜんぶ</b>に置く（「？」の面）</div>';
+    else h+='<div class="note">この<b>'+r.draw+'枚</b>を青いコードの山に入れ、ボードの同じ数字に目印を置く。</div>';
+  }
+  return h+'</div>';
+}
+function render(L,rolling){
+  var el=document.getElementById('res');
+  if(!L){el.innerHTML='<div class="empty">ミッションカードに合わせて本数をえらび、<br>「えらぶ」を押してください。</div>';return;}
+  var h=section('red',{use:L.redUse,draw:L.red.length,nums:L.red},rolling)+section('yel',{use:L.yelUse,draw:L.yel.length,nums:L.yel},rolling);
+  el.innerHTML=h||'<div class="empty">赤も黄色も「なし」です。青いコードだけで遊びます。</div>';
+}
+var busy=false;
+document.getElementById('go').addEventListener('click',function(){
+  if(busy)return;
+  if(st.last&&(st.last.red.length||st.last.yel.length)&&!confirm('いまの結果を消して、えらび直しますか？'))return;
+  var fin={red:pick(st.red.draw),redUse:st.red.use,yel:pick(st.yel.draw),yelUse:st.yel.use},btn=this,n=0;
+  if(!fin.red.length&&!fin.yel.length){st.last=fin;save();render(fin,false);return;}
+  busy=true;btn.disabled=true;
+  var tm=setInterval(function(){
+    render({red:pick(fin.red.length),redUse:fin.redUse,yel:pick(fin.yel.length),yelUse:fin.yelUse},true);
+    if(++n>=9){clearInterval(tm);st.last=fin;save();render(fin,false);busy=false;btn.disabled=false;btn.textContent='えらび直す';
+      document.getElementById('res').scrollIntoView({behavior:'smooth',block:'nearest'});}
+  },90);
+});
+if(st.last){render(st.last,false);if(st.last.red.length||st.last.yel.length)document.getElementById('go').textContent='えらび直す';}
+})();
+</script>
+</body>
+</html>
